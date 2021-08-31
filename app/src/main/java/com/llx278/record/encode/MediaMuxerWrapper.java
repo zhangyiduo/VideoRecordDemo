@@ -4,7 +4,9 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.Surface;
 
@@ -37,7 +39,7 @@ public class MediaMuxerWrapper {
                 throw new RuntimeException("create capture file failed!");
             }
             mediaMuxer = new MediaMuxer(outPutPath,MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-            mediaMuxer.setOrientationHint(90);
+            mediaMuxer.setOrientationHint(0);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -66,9 +68,7 @@ public class MediaMuxerWrapper {
     }
 
     private String createCaptureFile() {
-        File dir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
-                DIR_NAME);
+        File dir = new File("/sdcard/DCIM", DIR_NAME);
         if (!dir.exists()) {
             if (!dir.mkdir()) {
                 Log.e(TAG,"create capture file failed!!");
@@ -114,8 +114,8 @@ public class MediaMuxerWrapper {
         private long prevOutputPTSUs = 0;
 
         VideoCodecThread(int videoWidth,int videoHeight) {
-            this.videoWidth = videoWidth;
-            this.videoHeight = videoHeight;
+            this.videoWidth = videoHeight;
+            this.videoHeight = videoWidth;
         }
 
         void frameAvailableSoon() {
@@ -138,6 +138,7 @@ public class MediaMuxerWrapper {
             hasStarted = false;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         private void init() {
             Log.d(TAG, "videoCodec init");
 
